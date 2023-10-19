@@ -13,13 +13,16 @@ impl Plugin for PlayerPlugin{
 #[derive(Component)]
 struct Player;
 
+#[derive(Component)]
+struct Speed(f32);
+
 fn player_movement(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<(&mut Transform, &Speed), With<Player>>,
     camera_query: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ){
-    for mut player_transform in player_query.iter_mut(){
+    for (mut player_transform, player_speed) in player_query.iter_mut(){
 
         let cam: &Transform = match camera_query.get_single(){
             Ok(c) => c,
@@ -46,8 +49,7 @@ fn player_movement(
 
         direction.y = 0.0;
 
-        const SPEED: f32 = 2.0;
-        let movement = direction.normalize_or_zero() * time.delta_seconds() * SPEED;
+        let movement = direction.normalize_or_zero() * time.delta_seconds() * player_speed.0;
 
         player_transform.translation += movement;
 
@@ -64,7 +66,10 @@ fn spawn_player(
         material: materials.add(Color::BLUE.into()),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..default()
-    }, Player);
+    },
+        Speed(5.0), 
+        Player
+    );
 
     commands.spawn(player);
 }

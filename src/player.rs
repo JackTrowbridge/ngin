@@ -69,6 +69,7 @@ fn spawn_player(
         Speed(5.0),
         Player,
         ThirdPersonCameraTarget,
+        Name::new("Player"),
     );
 
     commands.spawn(player);

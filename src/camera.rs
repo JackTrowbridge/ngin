@@ -20,6 +20,7 @@ fn spawn_camera(
             zoom: Zoom::new(1.5, 20.0),
             ..default()
         },
+        Name::new("Main Camera"),
     );
 
     commands.spawn(camera);

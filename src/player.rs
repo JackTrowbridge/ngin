@@ -51,18 +51,25 @@ fn player_movement(
         let movement = direction.normalize_or_zero() * time.delta_seconds() * player_speed.0;
 
         player_transform.translation += movement;
+
+        // Rotate player to face camera
+        if direction.length_squared() > 0.0 {
+            player_transform.look_to(direction, Vec3::Y);
+        }
+
     }
 }
 
 fn spawn_player(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    assets: Res<AssetServer>,
 ) {
+
+    let flashlight = SpotLightBundle::default();
+
     let player = (
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-            material: materials.add(Color::BLUE.into()),
+        SceneBundle{
+            scene: assets.load("Player.gltf#Scene0"),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
@@ -72,5 +79,7 @@ fn spawn_player(
         Name::new("Player"),
     );
 
-    commands.spawn(player);
+    commands.spawn(player).with_children(|parent| {
+        parent.spawn(flashlight);
+    });
 }
